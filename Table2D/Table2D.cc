@@ -22,7 +22,7 @@ Table2D::Table2D(const vector <double> &x_, const vector <double> &y_, const vec
       insval(x_[i_x], y_[i_y], tab_[i_x][i_y]);
 }
 
-Table2D::Table2D(gfunction *func_): func(func_), bound({ 0, 0, 0, 0}), empty_x(true), empty_y(true) {}
+Table2D::Table2D(gfunction *func_): bound({ 0, 0, 0, 0}), empty_x(true), empty_y(true),  func(func_) {}
 
 int Table2D::setfunc(gfunction *func_) {
   func = func_;
