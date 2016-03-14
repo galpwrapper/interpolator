@@ -30,6 +30,8 @@ int Table2D::setfunc(gfunction *func_) {
 }
 
 inline void Table2D::check_bound(bool &empty, bound_order down, bound_order up, double val) {
+  printDebugMsg("Routine", ">>check_bound: empty = %s, down = %d, up = %d, bound size = %d",
+                empty ? "yes" : "no", down, up, int(bound.size()));
   if (empty) {
     bound[down] = val, bound[up] = val;
     empty = false;
@@ -37,6 +39,7 @@ inline void Table2D::check_bound(bool &empty, bound_order down, bound_order up, 
     if (val < bound[down]) bound[down] = val;
     if (val > bound[up]) bound[up] = val;
   }
+  printDebugMsg("Routine", "<<check_bound");
 }
 
 int Table2D::insline(double x_) {
@@ -113,6 +116,9 @@ int Table2D::inscolm(double y_) {
 
 int Table2D::insval(double x_, double y_, double val_) {
   printDebugMsg("Routine", ">>insval: x, y, val = %f, %f, %f", x_, y_, val_);
+  printDebugMsg("State", "empty_x: %s, empty_y: %s", empty_x ? "true" : "false",
+                empty_y ? "true" : "false");
+
   check_bound(empty_x, x_down, x_up, x_);
   check_bound(empty_y, y_down, y_up, y_);
 

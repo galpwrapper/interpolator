@@ -30,7 +30,7 @@ public:
   std::vector <double> bound;
   bool empty_x, empty_y;
 
-  Table2D() {};
+  Table2D(): bound({ 0, 0, 0, 0 }), empty_x(true), empty_y(true) {};
   Table2D(const std::vector <double> &x_, const std::vector <double> &y_, const std::vector <std::vector <double> > &tab_);
   Table2D(gfunction *func_);
 
