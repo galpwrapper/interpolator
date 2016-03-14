@@ -31,7 +31,7 @@ private:
   bool tranversx(Table2D &table, double err);
   bool tranversy(Table2D &table, double err);
   int checkaxis(const Table2D::Line &axis, double err);
-  double linask(const Table2D &table, double x, double y) const;
+  double ask(const Table2D &table, double x, double y) const;
   int create_table(Table2D &table, double range[4], double err);
 
   friend class boost::serialization::access;
@@ -61,5 +61,7 @@ public:
 
   double linask(double x, double y) const;
   double lnask(double x, double y) const;
+  double linask_bound(double x, double y) const;
+  double lnask_bound(double x, double y) const;
 };
 #endif // for #ifndef _INTERP2D_H

@@ -104,7 +104,7 @@ To Interpolate in a rectangle area, we first divide it into  four triangle and I
   if(itersm == object.end()) -- itersm;\
   itertype iterlg = itersm --
 
-double Interp2D::linask(const Table2D &table, double x, double y) const {
+double Interp2D::ask(const Table2D &table, double x, double y) const {
   obtiter(Table2D::TabConsIter, rowiterup, rowiterdown, table.value, x);
   obtiter(Table2D::LineConsIter, tliter, triter, rowiterup -> second, y);
   obtiter(Table2D::LineConsIter, bliter, briter, rowiterdown -> second, y);
@@ -132,17 +132,22 @@ double Interp2D::linask(const Table2D &table, double x, double y) const {
 }
 
 double Interp2D::linask(double x, double y) const {
-  return linask(tab, x, y);
+  return ask(tab, x, y);
+}
+double Interp2D::linask_bound(double x, double y) const {
+  return tab.inside(x, y) ? ask(tab, x, y) : 0;
 }
 
 #define RANGE(val) val > 700 ? 700 : (val < -700 ? -700 : val)
-
 double Interp2D::lnask(double x, double y) const {
   if (x <= 0 || y <= 0) cout << "Error::Interp2D::lnask: x or y out of range" << endl;
 
   x = log(x);
   y = log(y);
-  return exp(RANGE(linask(lntab, x, y)));
+  return exp(RANGE(ask(lntab, x, y)));
+}
+double Interp2D::lnask_bound(double x, double y) const {
+  return tab.inside(x, y) ? lnask(x, y) : 0;
 }
 
 #define INTERVAL_MIN 3e-16 //The min interval

@@ -6,7 +6,7 @@ each corresponding point (x, y). The value in each point is determined
 by a function you defined before.
  *********************************************************************/
 #include<boost/serialization/map.hpp>
-#include<vector>
+#include<boost/serialization/vector.hpp>
 #include<cstring>
 #include<fstream>
 #include<boost/archive/binary_oarchive.hpp>
@@ -26,24 +26,29 @@ public:
   Line xaxis, yaxis;
   Table value;
 
+  enum bound_order { x_down, x_up, y_down, y_up };
+  std::vector <double> bound;
+  bool empty_x, empty_y;
+
   Table2D() {};
   Table2D(const std::vector <double> &x_, const std::vector <double> &y_, const std::vector <std::vector <double> > &tab_);
   Table2D(gfunction *func_);
-
-  //int save(const std::string &filename) const;
-  //int read(const std::string &filename) const;
 
   int setfunc(gfunction *func_);
   int insline(double x_);
   int inscolm(double y_);
   int insval(double x_, double y_, double val_);
   int trans();
+  bool inside(double x_, double y_) const;
   int list() const;
   int clear();
 private:
   friend class boost::serialization::access;
   template <class Archive>
     void serialize(Archive &ar, const unsigned int version = 0) {
+      ar & empty_x;
+      ar & empty_y;
+      ar & bound;
       ar & xaxis;
       ar & yaxis;
       ar & value;
@@ -53,6 +58,8 @@ private:
   TabConsIter gettabiter(double xval) const;
   void notfoundwarn() const;
   const gfunction *func;
+
+  inline void check_bound(bool &empty, bound_order down, bound_order up, double val);
 
   double dx2(TabConsIter rowmiter, LineConsIter yiter) const;
   double dy2_core(TabConsIter rowmiter, LineConsIter yiter) const;

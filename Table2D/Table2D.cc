@@ -14,23 +14,36 @@ using std::ios;
 using std::string;
 using std::vector;
 
-Table2D::Table2D(const vector <double> &x_, const vector <double> &y_, const vector <vector <double> > &tab_) {
+Table2D::Table2D(const vector <double> &x_, const vector <double> &y_, const vector <vector <double> > &tab_):
+  bound({ 0, 0, 0, 0}), empty_x(true), empty_y(true)
+{
   for (unsigned i_x = 0; i_x < x_.size(); i_x++)
     for (unsigned i_y = 0; i_y < y_.size(); i_y++)
       insval(x_[i_x], y_[i_y], tab_[i_x][i_y]);
 }
 
-Table2D::Table2D(gfunction *func_): func(func_) {}
+Table2D::Table2D(gfunction *func_): func(func_), bound({ 0, 0, 0, 0}), empty_x(true), empty_y(true) {}
 
 int Table2D::setfunc(gfunction *func_) {
   func = func_;
   return 0;
 }
 
+inline void Table2D::check_bound(bool &empty, bound_order down, bound_order up, double val) {
+  if (empty) {
+    bound[down] = val, bound[up] = val;
+    empty = false;
+  } else {
+    if (val < bound[down]) bound[down] = val;
+    if (val > bound[up]) bound[up] = val;
+  }
+}
+
 int Table2D::insline(double x_) {
   printDebugMsg("Routine", ">>insline: x = %f", x_);
 
   if (xaxis.find(x_) != xaxis.end()) return 0;
+  check_bound(empty_x, x_down, x_up, x_);
 
   value[x_];
   xaxis[x_] = 0;
@@ -68,6 +81,7 @@ int Table2D::inscolm(double y_) {
   printDebugMsg("Routine", ">>inscolm: y = %f", y_);
 
   if (yaxis.find(y_) != yaxis.end()) return 0;
+  check_bound(empty_y, y_down, y_up, y_);
 
   for (TabIter rowiter = value.begin(); rowiter != value.end(); ++ rowiter)
     rowiter -> second[y_] = (*func)(rowiter -> first, y_);
@@ -99,6 +113,9 @@ int Table2D::inscolm(double y_) {
 
 int Table2D::insval(double x_, double y_, double val_) {
   printDebugMsg("Routine", ">>insval: x, y, val = %f, %f, %f", x_, y_, val_);
+  check_bound(empty_x, x_down, x_up, x_);
+  check_bound(empty_y, y_down, y_up, y_);
+
   value[x_][y_] = val_;
 
   if (xaxis.find(x_) == xaxis.end()) xaxis[x_] = 0;
@@ -123,7 +140,24 @@ int Table2D::trans() {
 
   value = valuetmp;
   xaxis.swap(yaxis);
+
+  double tmp;
+  tmp = bound[x_down];
+  bound[x_down] = bound[y_down];
+  bound[y_down] = tmp;
+
+  tmp = bound[x_up];
+  bound[x_up] = bound[y_up];
+  bound[y_up] = tmp;
   return 0;
+}
+
+bool Table2D::inside(double x_, double y_) const {
+  if ( x_ < bound[x_down] || x_ > bound[x_up] ||
+       y_ < bound[y_down] || y_ > bound[y_up])
+    return false;
+
+  return true;
 }
 
 int Table2D::list() const {
@@ -261,18 +295,3 @@ double Table2D::dy2(LineConsIter yiter) const {
   return dy2_max;
 }
 
-//int Table2D::save(const string &filename) const {
-//  fstream fout(filename.c_str(), ios::binary | ios::out);
-//  fout.write((char *) this, sizeof(*this));
-//  fout.close();
-//
-//  return 0;
-//}
-//
-//int Table2D::read(const string &filename) const {
-//  fstream fin(filename.c_str(), ios::binary | ios::in);
-//  fin.read((char *) this, sizeof(Table2D));
-//  fin.close();
-//
-//  return 0;
-//}
