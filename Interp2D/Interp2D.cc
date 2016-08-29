@@ -24,6 +24,7 @@ int IntpFunction::initial(gfunction *func_, bool ln_or_not_) {
 }
 
 int Interp2D::mapping() {
+  lnmap_exist = true;
   Table2D::LineConsIter enditer = tab.xaxis.end();
 
   for (Table2D::LineConsIter iter = tab.xaxis.begin(); iter != enditer; ++ iter)
@@ -52,6 +53,7 @@ int Interp2D::mapping() {
 }
 
 int Interp2D::lnmapping() {
+  map_exist = true;
   Table2D::LineConsIter enditer = lntab.xaxis.end();
 
   for (Table2D::LineConsIter iter = lntab.xaxis.begin(); iter != enditer; ++ iter)
@@ -132,6 +134,10 @@ double Interp2D::ask(const Table2D &table, double x, double y) const {
 }
 
 double Interp2D::linask(double x, double y) const {
+  if (!map_exist) {
+    cout << "Error::Interp2D::linask: map unexist" << endl;
+    exit(1);
+  }
   return ask(tab, x, y);
 }
 double Interp2D::linask_bound(double x, double y) const {
@@ -140,7 +146,14 @@ double Interp2D::linask_bound(double x, double y) const {
 
 #define RANGE(val) val > 700 ? 700 : (val < -700 ? -700 : val)
 double Interp2D::lnask(double x, double y) const {
-  if (x <= 0 || y <= 0) cout << "Error::Interp2D::lnask: x or y out of range" << endl;
+  if (x <= 0 || y <= 0) {
+    cout << "Error::Interp2D::lnask: x or y out of range" << endl;
+    exit(1);
+  }
+  if (!lnmap_exist) {
+    cout << "Error::Interp2D::lnask: lnmap unexist" << endl;
+    exit(1);
+  }
 
   x = log(x);
   y = log(y);
@@ -236,6 +249,7 @@ int Interp2D::create_table(Table2D &table, double range[4], double err) {
 }
 
 int Interp2D::creating(gfunction *func_, double range[4], double err) {
+  map_exist = true;
   function.initial(func_, false);
   create_table(tab, range, err);
   mapping();
@@ -243,11 +257,15 @@ int Interp2D::creating(gfunction *func_, double range[4], double err) {
 }
 
 int Interp2D::lncreating(gfunction *func_, double range[4], double err) {
+  lnmap_exist = true;
   function.initial(func_, true);
   double lnrange[4];
 
   for (int i = 0; i < 4; i++) {
-    if (range[i] <= 0) cout << "Error::Interp2D::lncreate_tab:range wrong" << endl;
+    if (range[i] <= 0) {
+      cout << "Error::Interp2D::lncreate_tab:range wrong" << endl;
+      exit(1);
+    }
 
     lnrange[i] = log(range[i]);
   }
@@ -257,22 +275,34 @@ int Interp2D::lncreating(gfunction *func_, double range[4], double err) {
   return 0;
 }
 
-Interp2D::Interp2D(gfunction *func_, double range[4], double err) {
+Interp2D::Interp2D(gfunction *func_, double range[4], double err): map_exist(false), lnmap_exist(false) {
   creating(func_, range, err);
 }
 
-Interp2D::Interp2D() {}
+Interp2D::Interp2D(): map_exist(false), lnmap_exist(false) {}
 
-Interp2D::Interp2D(const Table2D &tab_): tab(tab_) {
+Interp2D::Interp2D(const Table2D &tab_): map_exist(true), lnmap_exist(false), tab(tab_) {
   mapping();
 }
 int Interp2D::tabling(const Table2D &tab_) {
+  map_exist = true;
   tab = tab_;
   mapping();
   return 0;
 }
 int Interp2D::lntabling(const Table2D &lntab_) {
+  lnmap_exist = true;
   lntab = lntab_;
   lnmapping();
   return 0;
+}
+
+int Interp2D::del_map() {
+  map_exist = false;
+  return tab.Delete();
+}
+
+int Interp2D::del_lnmap() {
+  lnmap_exist = false;
+  return lntab.Delete();
 }

@@ -40,6 +40,7 @@ public:
   int insval(double x_, double y_, double val_);
   int trans();
   bool inside(double x_, double y_) const;
+  int Delete();
   int list() const;
   int clear();
 private:

@@ -22,6 +22,7 @@ public:
 
 class Interp2D {
 private:
+  bool map_exist, lnmap_exist;
   enum PointsNo {bl, tl, tr, br};
   std::vector <double> chlist;
   int lnmapping();
@@ -39,6 +40,8 @@ private:
     void serialize(Archive &ar, const unsigned int version = 0) {
       ar & lntab;
       ar & tab;
+      ar & map_exist;
+      ar & lnmap_exist;
     }
 
 public:
@@ -58,6 +61,9 @@ public:
   Interp2D(gfunction *func_, double range[4], double err);
   int creating(gfunction *func_, double range[4], double err);
   int lncreating(gfunction *func_, double range[4], double err);
+
+  int del_map();
+  int del_lnmap();
 
   double linask(double x, double y) const;
   double lnask(double x, double y) const;

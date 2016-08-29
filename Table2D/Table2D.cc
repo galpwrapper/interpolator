@@ -301,3 +301,9 @@ double Table2D::dy2(LineConsIter yiter) const {
   return dy2_max;
 }
 
+int Table2D::Delete() {
+  value.clear();
+  xaxis.clear();
+  yaxis.clear();
+  return 0;
+}
