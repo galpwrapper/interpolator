@@ -36,9 +36,9 @@ int interp::create_lntab()
   return 0;
 }
 
-int interp::get_index(const double x) const
+int interp::get_index(const double* xtab, const double x) const
 {
-  return (upper_bound(x_tab, x_tab + dim, x) - x_tab);
+  return (upper_bound(xtab, xtab + dim, x) - xtab);
 }
 
 /*********************************************************************
@@ -50,7 +50,7 @@ double interp:: laask(const double x, const int n) const
 {
   double l[dim];
   double result = 0;
-  int ind = get_index(x);
+  int ind = get_index(x_tab, x);
 
   for (int j = fmax(0, ind - n); j < fmin(dim, ind + n); j++) {
     l[j] = 1;
@@ -67,7 +67,7 @@ double interp:: laask(const double x, const int n) const
 
 double interp::linask(const double* xtab, const double* ytab, const double x) const
 {
-  int upind = get_index(x);
+  int upind = get_index(xtab, x);
   int ind = fmin(fmax(upind - 1, 0), dim - 2);
 
   return (x - xtab[ind + 1]) * (ytab[ind] - ytab[ind + 1]) / (xtab[ind] - xtab[ind + 1])

@@ -22,7 +22,7 @@ public:
   interp(const std::vector <double>& xtab_, const std::vector <double>& ytab_);
   interp(const spectrum& spec_);
 
-  int get_index(const double x) const;
+  int get_index(const double* xtab, const double x) const;
   double laask(const double x, const int n) const;
   double linask(const double x) const;
   double lnask(const double x) const;
