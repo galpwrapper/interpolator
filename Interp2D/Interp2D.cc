@@ -5,6 +5,7 @@
 #include<set>
 #include"Interp2D.h"
 
+using std::function;
 using std::cout;
 using std::endl;
 using std::vector;
@@ -12,16 +13,16 @@ using std::string;
 using std::log;
 
 #define logwb(expr) log(fmax(expr, 1e-300))
-double IntpFunction::operator()(double x, double y) const {
-  return ln_or_not ? logwb((*func)(exp(x), exp(y))) : (*func)(x, y);
-}
-IntpFunction::IntpFunction(gfunction *func_, bool ln_or_not_): func(func_), ln_or_not(ln_or_not_) {}
-IntpFunction::IntpFunction(): func(0), ln_or_not(false) {}
-int IntpFunction::initial(gfunction *func_, bool ln_or_not_) {
-  func = func_;
-  ln_or_not = ln_or_not_;
-  return 0;
-}
+class LnWrapper {
+private:
+  std::function<double(double,double)> func;
+public:
+  LnWrapper(const std::function<double(double,double)>& func_) : func(func_) {}
+
+  double operator()(double x, double y) const {
+    return logwb(func(exp(x), exp(y)));
+  }
+};
 
 int Interp2D::mapping() {
   lnmap_exist = true;
@@ -226,7 +227,6 @@ bool Interp2D::tranversy(Table2D &table, double err) {
 int Interp2D::create_table(Table2D &table, double range[4], double err) {
   tab.clear();
   lntab.clear();
-  table.setfunc(&function);
   double midx = (range[0] + range[2]) / 2,
          midy = (range[1] + range[3]) / 2;
   table.insline(range[0]);
@@ -248,17 +248,16 @@ int Interp2D::create_table(Table2D &table, double range[4], double err) {
   return 0;
 }
 
-int Interp2D::creating(gfunction *func_, double range[4], double err) {
+int Interp2D::creating(const function<double(double,double)>& func_, double range[4], double err) {
   map_exist = true;
-  function.initial(func_, false);
+  tab.setfunc(func_);
   create_table(tab, range, err);
   mapping();
   return 0;
 }
 
-int Interp2D::lncreating(gfunction *func_, double range[4], double err) {
+int Interp2D::lncreating(const function<double(double,double)>& func_, double range[4], double err) {
   lnmap_exist = true;
-  function.initial(func_, true);
   double lnrange[4];
 
   for (int i = 0; i < 4; i++) {
@@ -270,12 +269,13 @@ int Interp2D::lncreating(gfunction *func_, double range[4], double err) {
     lnrange[i] = log(range[i]);
   }
 
+  lntab.setfunc(LnWrapper(func_));
   create_table(lntab, lnrange, err);
   lnmapping();
   return 0;
 }
 
-Interp2D::Interp2D(gfunction *func_, double range[4], double err): map_exist(false), lnmap_exist(false) {
+Interp2D::Interp2D(const function<double(double,double)>& func_, double range[4], double err): map_exist(false), lnmap_exist(false) {
   creating(func_, range, err);
 }
 

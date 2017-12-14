@@ -6,6 +6,7 @@
 
 #include"mydebug.h"
 
+using std::function;
 using std::abs;
 using std::cout;
 using std::endl;
@@ -22,9 +23,9 @@ Table2D::Table2D(const vector <double> &x_, const vector <double> &y_, const vec
       insval(x_[i_x], y_[i_y], tab_[i_x][i_y]);
 }
 
-Table2D::Table2D(gfunction *func_): bound({ 0, 0, 0, 0}), empty_x(true), empty_y(true),  func(func_) {}
+Table2D::Table2D(const function<double(double,double)>& func_): bound({ 0, 0, 0, 0}), empty_x(true), empty_y(true),  func(func_) {}
 
-int Table2D::setfunc(gfunction *func_) {
+int Table2D::setfunc(const std::function<double(double,double)>& func_) {
   func = func_;
   return 0;
 }
@@ -61,7 +62,7 @@ int Table2D::insline(double x_) {
   -- xliter, ++ xhiter;
 
   for (LineConsIter yiter = yaxis.begin(); yiter != yaxis.end(); ++yiter)
-    rowmiter -> second[yiter -> first] = (*func)(x_, yiter -> first);
+    rowmiter -> second[yiter -> first] = func(x_, yiter -> first);
 
   xmiter -> second = dx2(rowmiter);
 
@@ -87,7 +88,7 @@ int Table2D::inscolm(double y_) {
   check_bound(empty_y, y_down, y_up, y_);
 
   for (TabIter rowiter = value.begin(); rowiter != value.end(); ++ rowiter)
-    rowiter -> second[y_] = (*func)(rowiter -> first, y_);
+    rowiter -> second[y_] = func(rowiter -> first, y_);
 
   yaxis[y_] = 0;
 

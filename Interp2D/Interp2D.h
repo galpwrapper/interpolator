@@ -9,17 +9,6 @@ but that function should not be divergent
 #include<boost/archive/text_iarchive.hpp>
 #include"Table2D.h"
 
-class IntpFunction: public gfunction {
-private:
-  const gfunction *func;
-  bool ln_or_not;
-public:
-  double operator()(double x, double y) const;
-  IntpFunction();
-  IntpFunction(gfunction *func_, bool ln_or_not_);
-  int initial(gfunction *func_, bool ln_or_not_);
-};
-
 class Interp2D {
 private:
   bool map_exist, lnmap_exist;
@@ -27,7 +16,7 @@ private:
   std::vector <double> chlist;
   int lnmapping();
   int mapping();
-  IntpFunction function;
+  std::function<double(double,double)> func;
   double tri_intp(double(*[3])[3], double x, double y) const;
   bool tranversx(Table2D &table, double err);
   bool tranversy(Table2D &table, double err);
@@ -58,9 +47,9 @@ public:
   maximal alloweded d^2f/dx^2*\Delta x^2 (or the same term for y)
   in the grids.
   *********************************************************************/
-  Interp2D(gfunction *func_, double range[4], double err);
-  int creating(gfunction *func_, double range[4], double err);
-  int lncreating(gfunction *func_, double range[4], double err);
+  Interp2D(const std::function<double(double,double)>& func_, double range[4], double err);
+  int creating(const std::function<double(double,double)>& func_, double range[4], double err);
+  int lncreating(const std::function<double(double,double)>& func_, double range[4], double err);
 
   int del_map();
   int del_lnmap();

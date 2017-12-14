@@ -9,9 +9,9 @@ by a function you defined before.
 #include<boost/serialization/vector.hpp>
 #include<cstring>
 #include<fstream>
+#include<functional>
 #include<boost/archive/binary_oarchive.hpp>
 #include<boost/archive/binary_iarchive.hpp>
-#include"gfunction.h"
 
 class Table2D {
 public:
@@ -32,9 +32,9 @@ public:
 
   Table2D(): bound({ 0, 0, 0, 0 }), empty_x(true), empty_y(true) {};
   Table2D(const std::vector <double> &x_, const std::vector <double> &y_, const std::vector <std::vector <double> > &tab_);
-  Table2D(gfunction *func_);
+  Table2D(const std::function<double(double,double)>& func_);
 
-  int setfunc(gfunction *func_);
+  int setfunc(const std::function<double(double,double)>& func_);
   int insline(double x_);
   int inscolm(double y_);
   int insval(double x_, double y_, double val_);
@@ -58,7 +58,7 @@ private:
   LineConsIter getlineiter(double axival, const Line &line) const;
   TabConsIter gettabiter(double xval) const;
   void notfoundwarn() const;
-  const gfunction *func;
+  std::function<double(double,double)> func;
 
   inline void check_bound(bool &empty, bound_order down, bound_order up, double val);
 
