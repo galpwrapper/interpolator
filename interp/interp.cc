@@ -33,6 +33,26 @@ interp::interp(const spectrum& spec_, bool with_spline_):
   if (with_spline) set_spline();
 }
 
+
+void interp::ini(const double* xtab_, const double* ytab_, unsigned n, bool with_spline_)
+{
+  x_tab = xtab_;
+  y_tab = ytab_;
+  dim = n;
+  with_spline = with_spline_;
+  ln_created = false;
+
+  if (with_spline) set_spline();
+}
+void interp::ini(const vector<double>& xtab_, const vector<double>& ytab_, bool with_spline_)
+{
+  return ini(&(xtab_[0]), &(ytab_[0]), xtab_.size(), with_spline_);
+}
+void interp::ini(const spectrum& spec_, bool with_spline_)
+{
+  return ini(&(spec_.E[0]), &(spec_.F[0]), spec_.E.size(), with_spline_);
+}
+
 void interp::show_vector(const string& k, const double* vec) const
 {
   cout << k << " is:" << endl;
@@ -94,9 +114,9 @@ double interp::spline_ask(const double* xtab, const double* ytab, const double* 
 
 void interp::set_spline()
 {
-  ln_created = false;
-
   set_m(x_tab, y_tab, m);
+
+  if (ln_created) set_m(&(lnx_tab[0]), &(lny_tab[0]), m_log);
   with_spline = true;
 }
 void interp::unset_spline() { with_spline = false; }

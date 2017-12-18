@@ -30,6 +30,10 @@ public:
   interp(const std::vector <double>& xtab_, const std::vector <double>& ytab_, bool with_spline_ = false);
   interp(const spectrum& spec_, bool with_spline_ = false);
 
+  void ini(const double* xtab_, const double* ytab_, unsigned n, bool with_spline_ = false);
+  void ini(const std::vector <double>& xtab_, const std::vector <double>& ytab_, bool with_spline_ = false);
+  void ini(const spectrum& spec_, bool with_spline_ = false);
+
   void set_spline();
   void unset_spline();
 
