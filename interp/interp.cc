@@ -75,6 +75,8 @@ void interp::show() const
 
 void interp::set_m(const double* xtab, const double* ytab, vector<double>& m_)
 {
+  if (dim < 2) return;
+
   m_.resize(dim);
   m_[0] = (ytab[1] - ytab[0]) / (xtab[1] - xtab[0]);
   m_[dim - 1] = (ytab[dim - 1] - ytab[dim - 2]) / (xtab[1] - xtab[0]);
@@ -131,7 +133,7 @@ int interp::create_lntab()
     lny_tab[i] = log(fmax(y_tab[i], 1e-300));
   }
 
-  set_m(&(lnx_tab[0]), &(lny_tab[0]), m_log);
+  if (with_spline) set_m(&(lnx_tab[0]), &(lny_tab[0]), m_log);
   ln_created = true;
   return 0;
 }
