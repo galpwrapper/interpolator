@@ -6,8 +6,8 @@ in the logscale
 *********************************************************************/
 #include<cstring>
 
-#include"spectrum.h"
-#include"vec_utils.h"
+#include "spectrum.h"
+#include "vec_utils.h"
 
 class interp
 {
@@ -45,5 +45,6 @@ public:
 
   int create_lntab();
   void show() const;
+  friend spectrum smooth(const interp& intp, double step_size, int filter_length, int polynomial_order);
 };
 #endif // for #ifndef _INTERP_H
